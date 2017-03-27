@@ -1,0 +1,86 @@
+#use <args>
+#use <conio>
+#use <parse>
+
+int main() {
+
+  string* vocab_filename = alloc(string);
+  string* tweet_filename = alloc(string);
+  string* fast_string = alloc(string);
+  string* top_string = alloc(string);
+
+  args_string("-v", vocab_filename);
+  args_string("-t", tweet_filename);
+  args_string("-f", fast_string);
+  args_string("-top", top_string);
+  args_parse();
+
+  string l1 = "\nPlease use as follows: ";
+  string l2 = "count -v <vocab_file> -t <twitter tweet file> -f <fast|slow> [-top <num>]";
+  string usage = string_join(l1,l2);
+
+  if (string_equal("", *vocab_filename) || string_equal("", *tweet_filename)) {
+    error(usage);
+  }
+
+  string_bundle vocab_bundle = read_words(*vocab_filename); // change to read_chars(*tweet_filename) for character counting
+  int vocab_length = string_bundle_length(vocab_bundle);
+  string[] vocab = string_bundle_array(vocab_bundle);
+
+  string_bundle words = read_words(*tweet_filename); // change to read_chars(*tweet_filename) for character counting
+  int tweets_length = string_bundle_length(words);
+  string[] tweets = string_bundle_array(words);
+
+  int[] freqs = alloc_array(int, vocab_length);
+
+  bool fast = true;
+  if (string_equal(*fast_string, "fast")) {
+    fast = true;
+  } else if (string_equal(*fast_string, "slow")) {
+    fast = false;
+  } else {
+    error(usage);
+  }
+
+  int unknown = count_vocab(vocab, freqs, vocab_length, 
+                            tweets, tweets_length, fast);
+
+  print("Unknown words: ");
+  printint(unknown);
+  println("");
+
+  // //@assert(freqs[binsearch("is",vocab,vocab_length)] == 1);
+  // //@assert(freqs[binsearch("out",vocab,vocab_length)] == 1);
+  // //@assert(freqs[binsearch("of",vocab,vocab_length)] == 1);
+  // //@assert(freqs[binsearch("his",vocab,vocab_length)] == 1);
+
+  if (! (string_equal(*top_string,""))) {
+    int* top = parse_int(*top_string,10);
+    if (top != NULL && *top <= vocab_length) 
+      {
+        
+        print("Top ");
+        print(*top_string);
+        print(" most frequent words in ");
+        print(*tweet_filename);
+        print(" (of the words in ");
+        print(*vocab_filename);
+        println(")");
+        
+        // sort(freqs,vocab,0,vocab_length);
+        selectionsort(freqs,vocab,0,vocab_length);
+        for (int i = 0; i < *top ; i = i + 1) {
+          print(vocab[i]);
+          print(" ");
+          printint(freqs[i]);
+          println("");
+        }
+      }
+    else {
+      error ("bad <top>: not a number, or more than in the tweetfile");
+    }
+  }
+
+  return 0;
+
+}

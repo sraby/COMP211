@@ -1,0 +1,162 @@
+/*
+ * Doubly linked lists with point
+ * 
+ * A doubly linked list (dll), where one of the
+ * elements in the dll is designated as containing the point.  The
+ * list is terminated on both ends with dummy nodes whose contents are
+ * never inspected.
+ * 
+ * */
+
+/*** Interface ***/
+
+typedef struct dll_node dll;
+struct dll_node {
+  elem data; /* This is defined elsewhere (gapbuf.c0 or elem-char.c0) */
+  dll* next;
+  dll* prev;
+};
+
+typedef struct dll_pt_header* dll_pt;
+struct dll_pt_header {
+  dll* start; /* the fist node of the list (on the left)  */
+  dll* point; /* the current node (where the cursor is)   */
+  dll* end;   /* the last node of the list (on the right) */
+};
+
+bool is_dll_pt(struct dll_pt_header* B);
+
+bool dll_pt_at_left(dll_pt B);  /* Returns true if the point is the        */
+                                /*   first (non-terminal) node of the list */
+bool dll_pt_at_right(dll_pt B); /* Returns true if the point is the        */
+                                /*   last (non-terminal) node of the list  */
+
+void dll_pt_forward(dll_pt B);  /* Moves the point forward, to the right   */
+void dll_pt_backward(dll_pt B); /* Moves the point backward, to the left   */
+void dll_pt_delete(dll_pt B);   /* Remove the point node from the list     */
+
+dll_pt dll_pt_new(elem pointe); /* Creates a new dll */
+void dll_pt_insert_before(dll_pt B, elem newel ); /* Inserts newel before the point */
+void dll_pt_insert_after(dll_pt B, elem newel ); /* Inserts newel after the point */
+
+/*** Implementation ***/
+
+bool links_ok(struct dll_pt_header* B)
+{ 
+
+	for (dll*cur = B->start; !(cur == B->end); cur = cur->next)
+	{ if (!(cur->next->prev == cur) || cur->next == NULL || cur->next->prev == NULL) {return false;}
+	}
+
+	return true; 
+}
+
+bool point_inside(struct dll_pt_header* B)
+{ for (dll*cur = B->start; !(cur == B->end); cur = cur->next)
+	{ if (cur == B->point) {return true;}
+	}
+
+	return false;
+}
+
+bool is_dll_pt(struct dll_pt_header* B)
+{ return (links_ok(B) && point_inside(B) && !(B->point == B->start) && !(B->point == B->end) );}
+
+
+bool dll_pt_at_left(dll_pt B) 
+//@requires is_dll_pt(B);
+//@ensures is_dll_pt(B);
+{  return (B->start->next == B->point); 
+}
+
+bool dll_pt_at_right(dll_pt B) 
+//@requires is_dll_pt(B);
+//@ensures is_dll_pt(B);
+{  return (B->end->prev == B->point); 
+}
+
+dll_pt dll_pt_new(elem pointe)
+//@ensures is_dll_pt(\result);
+//@ensures dll_pt_at_right(\result) && dll_pt_at_left(\result);
+	{
+		dll_pt new = alloc(struct dll_pt_header);
+		new->start = alloc(struct dll_node);
+		new->point = alloc(struct dll_node);
+		new->end = alloc(struct dll_node);
+
+		new->start->next = new->point;
+		new->point->prev = new->start; 
+		new->point->data = pointe; 
+		new->point->next = new->end;
+		new->end->prev = new->point; 
+
+		return new; 
+	}
+
+void dll_pt_insert_before(dll_pt B, elem newel)
+//@requires is_dll_pt(B);
+//@ensures is_dll_pt(B);
+	{ 	dll* after = B->point;
+		dll* before = B->point->prev; 
+
+		dll* insert = alloc(struct dll_node); 
+		insert->data = newel;
+		insert->next = after;
+		after->prev = insert;
+		insert->prev = before;
+		before->next = insert; 
+
+	}
+
+void dll_pt_insert_after(dll_pt B, elem newel)
+//@requires is_dll_pt(B);
+//@ensures is_dll_pt(B);
+{		dll* after = B->point->next;
+		dll* before = B->point; 
+
+		dll* insert = alloc(struct dll_node); 
+		insert->data = newel;
+		insert->next = after;
+		after->prev = insert;
+		insert->prev = before;
+		before->next = insert; 
+}
+
+void dll_pt_forward(dll_pt B) 
+//@requires is_dll_pt(B);
+//@requires !(dll_pt_at_right(B)); 
+//@ensures is_dll_pt(B); 
+{
+	B->point = B->point->next; 
+}
+
+void dll_pt_backward(dll_pt B)
+//@requires is_dll_pt(B);
+//@requires !(dll_pt_at_left(B)); 
+//@ensures is_dll_pt(B);
+{
+	B->point = B->point->prev; 
+}
+
+void dll_pt_delete(dll_pt B) 
+//@requires is_dll_pt(B);
+//@requires (!dll_pt_at_left(B)) || (!dll_pt_at_right(B));
+//@ensures is_dll_pt(B); 
+{ 
+	dll* deletion = B->point;
+	dll* before = B->point->prev;
+	dll* after = B->point->next; 
+
+	if (dll_pt_at_left(B)) { 
+		B->point = B->point->next;}
+	else if (dll_pt_at_right(B)) {
+		B->point = B->point->prev;}
+	else {
+		B->point = B->point->next;}
+
+	before->next = after;
+	after->prev = before; 
+
+}
+
+

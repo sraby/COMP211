@@ -1,0 +1,153 @@
+
+#use <conio>
+#use <string>
+
+// helper function to convert a character array to a string
+string array_to_string(char[] C, int length) {
+
+  string s = "";
+
+  for (int letter = 0; letter < length; letter = letter + 1){
+    s = string_join(s, string_fromchar(C[letter]));
+  }
+  return s; 
+
+}
+
+// length of result is string_length(s)
+char[] string_to_array(string s) {
+  int length = string_length(s);
+  char[] C = alloc_array(char,length);
+  for (int letter = 0; letter < length; letter = letter + 1){
+    C[letter] = string_charat(s,letter);
+  }
+  return C; 
+
+}
+
+// assumes length is the length of strings
+void print_strings(string[] strings, int length) {
+
+  for (int i = 0; i < length; i = i + 1) {
+    println(strings[i]);
+  }
+
+}
+
+// ----------------------------------------------------------------------
+// TASKS 
+
+// TASK 1
+char encrypt_char(char input, int shift) 
+{ int number = char_ord(input) + shift; 
+ if (number > 122) {
+    number = number - 26;
+  }
+  return char_chr(number); 
+}
+
+// TASK 2
+void encrypt(char[] message, int message_length, int shift) {
+  for (int i = 0; i < message_length; i = i + 1) {
+   message[i] = encrypt_char(message[i], shift); 
+  }
+} 
+
+// TASK 3
+string encrypt_string(string message, int shift) {
+
+  char[] secret = string_to_array(message); 
+
+  encrypt(secret, string_length(message), shift); 
+
+  return array_to_string(secret, string_length(message)); 
+}
+
+// TASK 5
+string decrypt_string(string message, int shift) {
+  return encrypt_string(message, 26 - shift); 
+}
+
+// TASK 6
+string[] possible_decryptions(string message) {
+
+  string[] pd = alloc_array(string,26); 
+ 
+  for (int i = 0; i < 26; i = i +1) {
+    pd[i] = decrypt_string(message, i);
+  }
+
+  print_strings(pd,26);
+  
+  return pd;
+
+}
+
+// TASK 7:
+// Decrypted message 1: Wyatt Rees: aselzwesklwjugvwj --> iamthemastercoder
+// Decrypted message 2: Jacob Glickman: atihvdctlndgzytih --> letsgonewyorkjets
+// Decrypted message 3: Wilson Fong: nfrbnqxts --> iamwilson 
+// Decrypted message 4: Victor Chu: byffi uff gs hugy cm pcwnil -->
+// hello all my name is victor
+// Decrypted message 5: Daniel Weiss: ohxuqksecgzkxhuzzrkekyzkxjge -->
+// ibrokemywaterbottleyesterday 
+
+// TASK 8:
+// The algorithm I used to decide which of the possible decryptions is the 
+// plaintext begins with me looking at the first printed string in the array.
+// If this string spells words that I recognize, I know it is the plaintext.
+// If this string doesn't spell words that I recognize, I move on to the
+// second printed string. I continue this process until I reach a string 
+// that I recognize as words. Therefore, this algorithm requires between
+// 1 and 26 "comparisons." This algorithm works because the probability of
+// two decryptions with different shifts spelling recognizeable words is very low. 
+
+//Task 9 E.C.:
+
+string encrypt_string_v(string message, string codeword) {
+   //make codeword big enough
+  while (string_length(codeword) < string_length(message)) {
+    codeword = string_join(codeword,codeword); 
+  }
+// use codeword to encrypt
+  char[] secret = string_to_array(message); 
+  char[] secretcode = string_to_array(codeword);
+
+  for (int i = 0; i < string_length(message); i = i + 1) {
+    int number = char_ord(secret[i]) + char_ord(secretcode[i]) - 97; 
+    // make sure output is lowercase letters
+    while (number > 122) {
+    number = number - 26;} 
+
+      secret[i] = char_chr(number); 
+  }
+
+  return array_to_string(secret, string_length(message)); 
+}
+
+string decrypt_string_v(string message, string codeword) {
+  //make codeword big enough
+  while (string_length(codeword) < string_length(message)) {
+    codeword = string_join(codeword,codeword); 
+  }
+// use codeword to encrypt
+  char[] secret = string_to_array(message); 
+  char[] secretcode = string_to_array(codeword);
+
+  for (int i = 0; i < string_length(message); i = i + 1) {
+    int number = char_ord(secret[i]) - char_ord(secretcode[i]) + 97;
+    // make sure output is lowercase letters  
+      while (number < 97) {
+        number = number + 26;
+      }
+      secret[i] = char_chr(number);
+  }
+
+  return array_to_string(secret, string_length(message)); 
+}
+
+// Task 10
+//Partner: Danny Weiss
+//Codeword: isabelsonesie 
+
+

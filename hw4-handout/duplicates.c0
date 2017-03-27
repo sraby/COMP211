@@ -1,0 +1,156 @@
+
+#use <string>
+
+bool all_distinct(string[] A, int n) 
+//@requires 0 <= n && n <= \length(A);
+//@requires is_sorted(A,0,n);
+{
+  for (int i = 0; i < n-1; i = i + 1) {
+    if (string_equal(A[i],A[i+1]))
+      {return false;}
+  }
+  return true; // since this is a sorted array, equivalent strings will be right next to each other!!
+}
+
+void test_all_distinct() {
+  string[] t = alloc_array(string,4);
+  t[0] = "a";
+  t[1] = "b";
+  t[2] = "c";
+  t[3] = "d";
+
+  assert (all_distinct(t,4));
+
+  t[1] = "c";
+
+  assert (!all_distinct(t,4));
+
+  t[1] = "a";
+
+  assert (!all_distinct(t,4));
+
+   t[1] = "b";
+   t[3] = "c";
+
+  assert (!all_distinct(t,4));
+  assert (all_distinct(t,3)); 
+
+
+
+}
+
+int count_distinct(string[] A , int n) 
+//@requires 0 <= n && n <= \length(A);
+//@requires is_sorted(A,0,n);
+//@ensures 0 <= \result && \result <= n;
+{ int count = n;
+    for (int i = 0; i < n-1; i = i + 1)
+    {if (string_equal(A[i],A[i+1]))
+      {count = count - 1;}
+    }
+  return count; // you need to edit this line
+}
+
+void test_count_distinct() {
+  string[] t = alloc_array(string,4);
+  t[0] = "a";
+  t[1] = "b";
+  t[2] = "c";
+  t[3] = "d";
+
+  assert (count_distinct(t,4) == 4);
+
+  t[1] = "a";
+
+  assert (count_distinct(t,4) == 3);
+
+  t[1] = "b";
+  t[3] = "c";
+
+  assert (count_distinct(t,4) == 3);
+  assert (count_distinct(t,3) == 3);
+  
+}
+
+
+string[] remove_duplicates(string[] A, int n) 
+//@requires 0 <= n && n <= \length(A);
+//@requires is_sorted(A,0,n);
+//@ensures is_sorted(\result,0,\length(\result));
+//@ensures all_distinct(\result,\length(\result));
+//@ensures \length(\result) == count_distinct(A,n);
+
+{
+
+  string[] result = alloc_array(string, count_distinct(A,n)); 
+  result[0] = A[0];
+  int result_spot = 1;
+
+
+  for (int i = 1; i < n; i = i + 1)
+  //@loop_invariant is_sorted(result,0,result_spot);
+  //@loop_invariant all_distinct(result,result_spot);
+  //@loop_invariant i>= 1;
+
+  {if (!string_equal(A[i-1],A[i]))
+      { result[result_spot] = A[i];
+        result_spot = result_spot + 1;}
+   } 
+
+  return result;
+}
+
+// string array equivalency helper function: 
+bool equivalent(string[] A, string[] B, int length) {
+    for (int i = 0; i < length; i = i + 1)
+    { if (!(string_equal(A[i],B[i]))) {return false;}
+    }
+    return true; 
+  }
+
+
+void test_duplicates() {
+
+  string[] t = alloc_array(string,4);
+  t[0] = "a";
+  t[1] = "b";
+  t[2] = "c";
+  t[3] = "d";
+
+  string[] dup = remove_duplicates(t,4);
+
+  assert (equivalent(t,dup,4)); 
+
+  t[1] = "a";
+
+  string[] q = alloc_array(string,3);
+
+  q[0] = "a";
+  q[1] = "c";
+  q[2] = "d";
+
+  string[] dup1 = remove_duplicates(t,4);
+
+  assert (equivalent(q,dup1,3)); 
+
+  t[1] = "b";
+  t[3] = "c";
+
+  string[] r = alloc_array(string,3);
+
+  r[0] = "a";
+  r[1] = "b";
+  r[2] = "c"; 
+
+  string[] dup2 = remove_duplicates(t,4);
+
+  assert (equivalent(r,dup2,3)); 
+
+  string[] dup3 = remove_duplicates(t,3);
+
+  assert (equivalent(r,dup2,3)); 
+  
+}
+
+
+

@@ -1,0 +1,105 @@
+
+void test_dll() {
+
+  // FIGURE 1 in the handout
+  {
+  dll_pt F1 = alloc(struct dll_pt_header);
+
+  dll* anode = alloc(dll);
+  dll* bnode = alloc(dll);
+
+  F1->start = alloc(dll);
+  F1->point = bnode;
+  F1->end = alloc(dll);
+
+  F1->start->prev = NULL;
+  F1->start->data = '\0';
+  F1->start->next = anode;
+
+  anode->prev = F1->start;
+  anode->data = 'a';
+  anode->next = bnode;
+
+  bnode->prev = anode;
+  bnode->data = 'b';
+  bnode->next = F1->end;
+
+  F1->end->prev = bnode;
+  F1->end->data = '\0';
+  F1->end->next = NULL;
+
+  assert(is_dll_pt(F1));
+  }
+
+
+  // FIGURE 2 in the handout
+  {
+  dll_pt F2 = alloc(struct dll_pt_header);
+
+  dll* anode = alloc(dll);
+  dll* bnode = alloc(dll);
+  dll* bnode2 = alloc(dll);
+
+  F2->start = alloc(dll);
+  F2->point = bnode2;
+  F2->end = alloc(dll);
+
+  F2->start->prev = NULL;
+  F2->start->data = '\0';
+  F2->start->next = anode;
+
+  anode->prev = F2->start;
+  anode->data = 'a';
+  anode->next = bnode;
+
+  bnode->prev = anode;
+  bnode->data = 'b';
+  bnode->next = F2->end;
+
+  F2->end->prev = bnode;
+  F2->end->data = '\0';
+  F2->end->next = NULL;
+
+  bnode2->prev = F2->start;
+  bnode2->data = 'b';
+  bnode2->next = F2->end;
+
+  assert(! (is_dll_pt(F2)));
+  }
+
+  // FIGURE 3 in the handout
+  {
+  dll_pt F3 = alloc(struct dll_pt_header);
+
+  dll* anode = alloc(dll);
+  dll* bnode = alloc(dll);
+  dll* bnode2 = alloc(dll);
+
+  F3->start = alloc(dll);
+  F3->point = bnode2;
+  F3->end = alloc(dll);
+
+  F3->start->prev = NULL;
+  F3->start->data = '\0';
+  F3->start->next = anode;
+
+  anode->prev = F3->start;
+  anode->data = 'a';
+  anode->next = bnode2;
+
+  bnode->prev = anode;
+  bnode->data = 'b';
+  bnode->next = F3->end;
+
+  F3->end->prev = bnode;
+  F3->end->data = '\0';
+  F3->end->next = NULL;
+
+  bnode2->prev = anode;
+  bnode2->data = 'b';
+  bnode2->next = F3->end;
+
+  assert(! (is_dll_pt(F3)));
+  }
+
+}

@@ -1,0 +1,136 @@
+#use <conio>
+
+int count_vocab(string[] vocab, int[] freq, int table_length,
+                string[] tweet_words, int tweet_words_length,
+                bool fast)
+//@requires table_length == \length(vocab) && table_length == \length(freq);
+//@requires \length(tweet_words) == tweet_words_length;
+//@requires is_sorted(vocab, 0, table_length) && all_distinct(vocab, table_length);
+{
+int count = 0;
+
+	{ for (int i = 0; i < tweet_words_length; i = i + 1)
+		{ if (fast == true) { int search = binsearch(tweet_words[i], vocab, table_length);
+			if (search == -1) {count = count + 1;}
+			else {freq[search] = freq[search] + 1;}
+		  		 }
+
+		  if (fast == false) { int search = linsearch(tweet_words[i], vocab, table_length);
+		  	if (search == -1) {count = count + 1;}
+		  	else {freq[search] = freq[search] + 1;}
+		  		}
+		}
+	}
+
+return count; 
+}
+
+/*Top 100 most frequent words in texts/twitter_200k.txt (of the words in texts/vocab_sorted.txt)
+i 83670
+to 37445
+the 36925
+lol 35615
+a 30300
+u 28033
+my 25093
+you 24574
+me 21326
+it 21144
+is 17716
+that 17563
+in 16631
+m 16526
+and 16452
+n 16118
+on 15985
+s 15388
+do 14329
+for 12699
+t 12278
+of 11360
+up 10640
+what 10269
+be 9907
+like 9852
+so 9604
+get 9150
+this 9004
+have 8732
+not 8674
+was 8585
+but 8415
+good 8356
+just 8168
+at 7462
+all 7261
+go 7178
+no 7164
+out 7077
+got 6989
+now 6875
+we 6824
+love 6708
+2 6635
+if 6595
+with 6400
+its 6377
+how 6163
+are 6036
+he 5587
+know 5515
+she 5165
+can 5158
+your 4985
+they 4771
+too 4675
+about 4604
+when 4571
+need 4413
+see 4236
+im 4230
+day 4054
+time 3980
+some 3972
+one 3929
+where 3926
+back 3925
+right 3897
+ya 3806
+think 3761
+or 3740
+ok 3706
+there 3616
+her 3588
+will 3558
+from 3477
+want 3408
+oh 3354
+why 3344
+new 3173
+morning 3097
+follow 3085
+here 3070
+going 3024
+did 3023
+man 2983
+been 2952
+make 2935
+work 2928
+hey 2912
+bout 2892
+da 2879
+let 2856
+am 2855
+really 2833
+off 2798
+d 2789
+today 2749
+say 2702 
+*/
+
+/* When I try to calculate the top 100 list using 
+"slow" linear search, shell pauses for a very long time and 
+fails to execute the command in a timely manner. */
+
+
+

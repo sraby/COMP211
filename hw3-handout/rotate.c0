@@ -1,0 +1,38 @@
+
+#use <util>
+
+pixel[] rotate (pixel[] A, int width, int height)
+//@requires width>0 && height>0;
+//@requires width*height == \length(A);
+//@requires width == height;
+//@ensures width*height*4 == \length(\result); 
+{
+	// make 4 pixel[] with each orientation of the original 
+  pixel[] B = alloc_array(pixel, 4*width*height);
+  pixel[] bottom_r = rotate90(A, width, height);
+  pixel[] bottom_l = rotate90(bottom_r, width, height);
+  pixel[] top_l = rotate90(bottom_l, width, height);
+  	//put them all together! 
+  		for (int row = 0; row < height; row = row + 1){
+  			for (int col = 0; col < width; col = col + 1) {
+  			B[row*(2*width) + col] = top_l[row*width + col];
+  		}
+  	}
+  		for (int row = 0; row < height; row = row + 1){
+  			for (int col = width; col < 2*width ; col = col + 1) {
+  			B[row*(2*width) + col] = A[row*width + (col - width)];
+  		}
+  	}
+  		for (int row = height; row < 2*height; row = row + 1){
+  			for (int col = 0; col < width; col = col + 1) {
+  			B[row*2*width + col] = bottom_l[(row-height)*width + col];
+  		}
+  	}
+  		for (int row = height; row < 2*height; row = row + 1){
+  			for (int col = width; col < 2*width; col = col + 1) {
+  			B[row*2*width + col] = bottom_r[(row - height)*width + (col - width)];
+  		}
+  	}
+
+  return B;
+}

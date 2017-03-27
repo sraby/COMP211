@@ -1,0 +1,64 @@
+/* Assumes that pixel is already defined to be an int (pixel.c0) */
+/* typedef int pixel; */
+
+#use <util>
+
+pixel quantize_pixel(pixel p, int q) 
+//@requires 0 <= q && q < 8;
+
+{ 	//isolate each portion of the pixel
+	pixel a = 0xFF000000 & p;
+	pixel r = 0x00FF0000 & p;
+	pixel g = 0x0000FF00 & p;
+	pixel b = 0x000000FF & p; 
+
+	// create a pixel that contains 1's where you want it to and 0's elsewhere
+	pixel r_shift = (0x00FF0000 << q) & 0x00FF0000;
+	pixel g_shift = (0x0000FF00 << q) & 0x0000FF00;
+	pixel b_shift = (0x000000FF << q) & 0x000000FF; 
+
+	// quantize each color 
+	r = r & r_shift;
+	g = g & g_shift;
+	b = b & b_shift;
+
+	return a | r | g | b; 
+}
+
+void test_quantize() {
+  pixel p = quantize_pixel(0xFFFFFFFF, 4);
+  assert(p == 0xFFF0F0F0);
+
+  p = quantize_pixel(0xFAFBFCFD, 0);  
+  assert(p == 0xFAFBFCFD);
+
+  p = quantize_pixel(0xF1F2F3F4, 7);
+  assert(p == 0xF1808080);
+}
+
+pixel[] quantize (int q, pixel[] A, int width, int height)
+//@requires width>0 && height>0;
+//@requires width*height == \length(A);
+//@requires q >= 0 && q < 8; 
+//@ensures width*height == \length(\result);
+{
+  pixel[] B = alloc_array(pixel, width*height); 
+  for (int i = 0; i < width*height; i = i+1)
+  //@loop_invariant i >= 0;
+  {
+  	B[i] = quantize_pixel(A[i], q);
+  }
+  return B;
+}
+
+//Task 8: 
+//Here is a list of file sizes for each quantized gargoyle image:
+//2.6M  images/gargoyle_quantize1.png
+//2.1M  images/gargoyle_quantize2.png
+//1.6M  images/gargoyle_quantize3.png
+//1.3M  images/gargoyle_quantize4.png
+//909K  images/gargoyle_quantize5.png
+//492K  images/gargoyle_quantize6.png
+//215K  images/gargoyle_quantize7.png
+
+//I start to notice a difference at quantization level 5. 

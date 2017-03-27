@@ -1,0 +1,48 @@
+
+// version I had in mind before class
+int max_index(int[] A, int lower, int upper) 
+//@requires 0 <= lower && lower < upper && upper <= \length(A);
+//@ensures lower <= \result && \result < upper;
+//ensures le_seg(A[\result],A,lower,upper);
+{
+  
+  int max_index = lower;
+  int max_so_far = A[lower];
+
+  for (int i = lower+1; i < upper; i = i + 1) 
+    //@loop_invariant lower <= i && i <= upper;
+    //@loop_invariant lower <= max_index && max_index < upper;
+    //@loop_invariant A[max_index] == max_so_far;
+    //loop_invariant ge_seg(max_so_far,A,lower,i);
+    {
+      if (A[i] > max_so_far) 
+        {
+          max_so_far = A[i];
+          max_index = i;
+        }
+    }
+
+  // at the end, i == upper, so 
+  // assert ge_seg(max_so_far,A,lower,upper);
+  return max_index;
+}
+
+// sort based on A, but keep B in synch; useful for dictionaries
+void selectionsort(int[] A, string[] B, int lower, int upper)
+//@requires \length(A) == \length(B);
+//@requires 0 <= lower && lower <= upper && upper <= \length(A);
+//ensures is_sorted(A,lower,upper);
+{
+  for (int i = lower; i < upper; i = i + 1)
+    //@loop_invariant lower <= i && i <= upper;
+    //loop_invariant is_sorted(A,lower,i);
+    //loop_invariant le_segs(A,lower,i,i,upper);
+    {
+      int next_index = max_index(A,i,upper);
+      swapint(A,i,next_index);
+      swap(B,i,next_index);
+    }
+
+  // at the end, i == upper, so is_sorted(A,lower,upper)
+
+}

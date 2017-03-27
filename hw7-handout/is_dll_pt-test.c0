@@ -1,0 +1,392 @@
+#use <args>
+#use <conio>
+#use <file>
+#use <string>
+
+dll_pt construct_char_buffer(string s) 
+{
+  int limit = string_length(s);
+  dll_pt B = alloc(struct dll_pt_header);
+
+  B->start = alloc(struct dll_node);
+
+  dll* last = B->start;
+  for(int i = 0; i < limit; i++) 
+    //@loop_invariant 0 <= i && i <= limit;
+    {
+      last->next = alloc(struct dll_node);
+      last->next->prev = last;
+      last->next->data = string_charat(s,i);
+      last = last->next;
+    }
+
+  last->next = alloc(struct dll_node);
+  last->next->prev = last;
+
+  B->point = last;
+  B->end = last->next;
+
+  return B;
+}
+
+int main() {
+
+  println("Running test 1");
+  {
+    dll_pt B = construct_char_buffer("a");
+
+    // Check valid positions for the point
+    B->point = B->end->prev;
+    while (B->point != B->start) {
+      //print("At: "); printchar(B->point->data); println("");
+      if (!is_dll_pt(B)) { println("TEST FAILED: is_dll_pt on valid buffer (checking all point positions)"); }
+      B->point = B->point->prev;
+    }
+  }
+  println("Running test 2");
+  {
+    dll_pt B = construct_char_buffer("ab");
+
+    // Check valid positions for the point
+    B->point = B->end->prev;
+    while (B->point != B->start) {
+      //print("At: "); printchar(B->point->data); println("");
+      if (!is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return true on a valid buffer"); }
+      B->point = B->point->prev;
+    }
+  }
+  println("Running test 3");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    
+    // Check valid positions for the point
+    B->point = B->end->prev;
+    while (B->point != B->start) {
+      //print("At: "); printchar(B->point->data); println("");
+      if (!is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return true on a valid buffer"); }
+      B->point = B->point->prev;
+    }
+  }
+  println("Running test 4");
+  {
+    dll_pt B = construct_char_buffer("hitherehowareyou");
+
+    // Check valid positions for the point
+    B->point = B->end->prev;
+    while (B->point != B->start) {
+      //print("At: "); printchar(B->point->data); println("");
+      if (!is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return true on a valid buffer"); }
+      B->point = B->point->prev;
+    }
+  }
+  println("Running test 5");
+  {
+    dll_pt B = construct_char_buffer("abc");
+
+    B->point = B->start;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when point is the start"); }
+
+    B->point = B->end;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when point is the end"); }
+  }
+
+  println("Running test 6");
+  // NULL CHECK CITY
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->start->next = NULL;                       
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 1"); }
+  }
+  println("Running test 7");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->start->next->next = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 2"); }
+  }
+  println("Running test 8");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->point->next = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 3"); }
+  }
+  println("Running test 9");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->point->next->next = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 4"); }
+  }
+  println("Running test 10");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->end->prev = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 5"); }
+  }
+  println("Running test 11");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->end->prev->prev = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 6"); }
+  }
+  println("Running test 12");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->point->prev = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 7"); }
+  }
+  println("Running test 13");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->point->prev->prev = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 8"); }
+  }
+  println("Running test 14");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->start = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 9"); }
+  }
+  println("Running test 15");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->point = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 10"); }
+  }
+  println("Running test 16");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+    B->end = NULL;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has NULLs 11"); }
+  } 
+  println("Running test 17");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point = node;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false on handout Figure 2"); }
+  }
+  println("Running test 18");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point->next = node;
+    node->prev = B->point;                      
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false on handout Figure 3"); }
+  }
+  println("Running test 19");
+  {
+    dll_pt B = construct_char_buffer("abc");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point = B->point->prev;
+    B->start->next = node;
+    B->end->prev = node;
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when point is not on path from start to end"); }
+  }
+
+  // BAD POINTER CITY
+  println("Running test 20");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->start->next = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 1"); }
+
+  }
+  println("Running test 21");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->start->next->next = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 2"); }
+
+  }
+  println("Running test 22");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point->next = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 3"); }
+
+  }
+  println("Running test 23");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point->next->next = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 4"); }
+
+  }
+  println("Running test 24");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->end->prev = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 5"); }
+
+  }
+  println("Running test 25");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->end->prev->prev = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 6"); }
+
+  }
+  println("Running test 26");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point->prev = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 7"); }
+
+  }
+  println("Running test 27");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point->prev->prev = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 8"); }
+
+  }
+  println("Running test 28");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->start = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 9"); }
+
+  }
+  println("Running test 29");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->point = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 10"); }
+
+  }
+  println("Running test 30");
+  {
+    dll_pt B = construct_char_buffer("ab");
+    B->point = B->point->prev;
+
+    struct dll_node* node = alloc(struct dll_node);
+    node->prev = B->start;
+    node->next = B->end;
+    node->data = 'b';
+
+    B->end = node;
+    
+    if (is_dll_pt(B)) { println("TEST FAILED: is_dll_pt should return false when list has incorrectly linked pointers 11"); }
+
+  }
+  println("Running test 31");
+  { 
+    if (is_dll_pt(NULL)) { println("TEST FAILED: is_dll_pt should return false on NULL"); }
+  }
+  println("Running test 32");
+  { 
+    if (is_dll_pt(alloc(struct dll_pt_header))) { println("TEST FAILED: is_dll_pt(B) should return false when B->everything==NULL"); }
+  }
+ 
+
+  println("If you don't see any 'TEST FAILED' messages above this, your is_dll_pt passed all the tests.");
+  return 0;
+}

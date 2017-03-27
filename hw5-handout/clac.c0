@@ -1,0 +1,117 @@
+/*
+ * Clac, stack-based calculator language
+ *
+ * Principles of Imperative Computation
+ */
+
+#use <string>
+#use <parse>
+#use <conio>
+#use <args>
+#use <util>
+
+/* Return true: clac top-level interpreter will expect more input */
+/* Return false: clac top-level interpreter will exit */
+bool eval(string op, stack S)
+// requires that there are enough numbers on S to perform the operation 'op'
+{
+  // you can uncomment this line to have clac print each operation
+  // as you process it.  
+  // print("Read: "); print(op); print("\n");
+
+  if (string_equal(op, "quit")) {
+
+    // we've written the case for quit for you
+    // you don't need to change this code.  
+    
+    return false; /* do not continue */
+    
+  }
+  else if (string_equal(op,"+")) {
+
+      int y = pop(S);
+      int x = pop(S);
+      int add = x + y; 
+      push(S,add);
+
+      return true;
+  }
+
+  else if (string_equal(op,"*")) {
+
+      int y = pop(S);
+      int x = pop(S);
+      int mult = x*y; 
+      push(S,mult);
+
+      return true;
+
+  }
+
+  else if (string_equal(op,"drop")) {
+
+    pop(S); 
+    return true; 
+
+  }
+
+  else if (string_equal(op,"swap")) {
+
+      int y = pop(S);
+      int x = pop(S);
+      push(S,y);
+      push(S,x);
+
+      return true;
+
+    }
+
+  else if (string_equal(op,"dup")) {
+
+      int x = pop(S);
+      push(S,x);
+      push(S,x);
+
+      return true;
+  }
+
+  else if (string_equal(op,"third")) {
+
+      int z = pop(S);
+      int y = pop(S);
+      int x = pop(S);
+      push(S,y);
+      push(S,z);
+      push(S,x);
+
+      return true;
+
+    }
+
+  // TASK: add more else if's for the other operations
+
+  else {
+
+    // we've written the case for numbers for you
+    // you don't need to change this code.  
+    
+    /* not defined as an operation name, should be an int */
+    int* p = parse_int(op, 10);
+    if (p == NULL) { /* not an int */
+      /* call error(msg) which prints msg and aborts */
+      error(string_join("undefined operation ", op));
+    }
+    push(S, *p);
+
+  }
+  
+  return true;                  /* continue */
+}
+
+
+
+// BONUS TASK
+bool always_enough(string[] ops, int ops_size, int start_size)
+{
+  return true;
+}

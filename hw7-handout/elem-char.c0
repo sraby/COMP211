@@ -1,0 +1,3 @@
+// Declares the elem to be char
+
+typedef char elem;
